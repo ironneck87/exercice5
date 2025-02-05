@@ -1,0 +1,32 @@
+services:
+  db:
+    image: mysqlbeer:1.0
+    build:
+      context: ./sql
+    container_name: mysql
+    restart: always
+    #    healthcheck:
+    #      test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 --password="$$(cat /run/secrets/db-password)" --silent']
+    #      interval: 3s
+    #      retries: 5
+    #      start_period: 30s
+    env_file: .env
+    #    volumes:
+    #      - db-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  api:
+    image: apibeer:1.0
+    build:
+      context: ./api
+    container_name: api
+    restart: always
+    ports:
+      - 8000:80
+    depends_on:
+      - db
+    links:
+      - db
+
+      #condition: service_healthy
